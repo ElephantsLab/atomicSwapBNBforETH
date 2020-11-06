@@ -1,0 +1,19 @@
+{
+  "name": "jrc-token",
+  "version": "1.0.0",
+  "description": "test",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "truffle-hdwallet-provider": "^1.0.17",
+    "zeppelin-solidity": "^1.12.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
