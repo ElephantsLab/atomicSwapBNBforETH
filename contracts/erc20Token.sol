@@ -61,12 +61,12 @@ contract erc20Token is ERC20 {
     event Voting(address account);
     event newOwner(address account);
 
-    modifier someOwner(uint _amount) {
+    modifier someOwner(uint _amount, address _address) {
         bool tmp = false;
         for (uint i = 0; i < owners.length; i++) {
-            if (owners[i] == msg.sender) {
+            if (owners[i] == _address) {
                 tmp = true;
-                require(msg.sender == owners[i], "Only owner can call this function.");
+                require(_address == owners[i], "Only owner can call this function.");
                 require(balances[owners[i]] >= _amount, "Owner's balance is not inappropriate");
                 break;
             }
@@ -76,6 +76,19 @@ contract erc20Token is ERC20 {
         _;
     }
 
+    modifier someOwnerForMint(uint _amount, address _address) {
+        bool tmp = false;
+        for (uint i = 0; i < owners.length; i++) {
+            if (owners[i] == _address) {
+                tmp = true;
+                require(_address == owners[i], "Only owner can call this function.");
+                break;
+            }
+        }
+        require(tmp == true);
+        require(now > startTime + 5 minutes);
+        _;
+    }
 
 
     modifier isOwner(address _user) {
@@ -143,12 +156,12 @@ contract erc20Token is ERC20 {
         balances[_sender] = safeExhaustion(balances[_sender], _amount);
         balances[_recipient] = safeOverflow(balances[_recipient], _amount);
 
-        for(uint i = 0; i < owners.length; i++) {
-            if(owners[i] == _recipient) {
-                emit Transfer(_sender, _recipient, _amount);
-                return;
-            }
-        }
+//        for(uint i = 0; i < owners.length; i++) {
+//            if(owners[i] == _recipient) {
+//                emit Transfer(_sender, _recipient, _amount);
+//                return;
+//            }
+//        }
         if (votesAccounts[_recipient].isHolder == false) {
             allHolders.push(_recipient);
             votesAccounts[_recipient].isHolder == true;
@@ -182,10 +195,17 @@ contract erc20Token is ERC20 {
     //        return true;
     //    }
 
-    function burn(uint _amount) someOwner(_amount) returns (bool) {
+    function burn(uint _amount, address _address) someOwner(_amount, _address) returns (bool) {
         _totalSupply = safeExhaustion(_totalSupply, _amount);
-        balances[msg.sender] = safeExhaustion(balances[msg.sender], _amount);
+        balances[_address] = safeExhaustion(balances[_address], _amount);
         emit Burn(_amount);
+        return true;
+    }
+
+    function mint(uint256 _amount, address _address) someOwnerForMint(_amount, _address) external returns (bool){
+        require(_address == _owner, "Only owner can mint tokens");
+        balances[_address] = safeOverflow(balances[_address], _amount);
+        _totalSupply = safeOverflow(_totalSupply, _amount);
         return true;
     }
 
