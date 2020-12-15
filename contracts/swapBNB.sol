@@ -13,10 +13,6 @@ contract swapBNB {
 
     address public owner;
 
-    string secretBTC;
-    uint amountToken;
-    address participiantAddress;
-
     constructor(address _participant) public payable{
         description.amount = msg.value;
         description.participant = _participant;
